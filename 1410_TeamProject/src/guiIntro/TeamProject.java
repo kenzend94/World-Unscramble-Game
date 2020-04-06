@@ -9,6 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 
 public class TeamProject extends JFrame {
 	
@@ -40,10 +43,89 @@ public class TeamProject extends JFrame {
 		JMenuBar menuBar = menuBar();
 		setJMenuBar(menuBar);
 		
+		
+		
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JButton btnTwist = buttonTwist();
+		contentPane.add(btnTwist);
+		
+		JButton btnEnter = buttonEnter();
+		contentPane.add(btnEnter);
+		
+		JButton btnLastWord = buttonLastWord();
+		contentPane.add(btnLastWord);
+		
+		JButton btnClear = buttonClear();
+		contentPane.add(btnClear);
+		
+		JLabel lblScore = labelScore();
+		contentPane.add(lblScore);
+		
+		JLabel lblTime = labelTime();
+		contentPane.add(lblTime);
+		
+		JLabel lblName = labelName();
+		contentPane.add(lblName);
+		
+		JLabel label = labelYourName();
+		contentPane.add(label);
+		
+		String name = JOptionPane.showInputDialog("Please enter your name below:");
+		label.setText(name);
+		
+	}
+
+	private JLabel labelYourName() {		
+		JLabel label = new JLabel("");
+		label.setBounds(49, 11, 46, 14);
+		return label;
+	}
+
+	private JLabel labelName() {
+		JLabel lblName = new JLabel("Name:");
+		lblName.setBounds(10, 11, 46, 14);
+		return lblName;
+	}
+
+	private JLabel labelTime() {
+		JLabel lblTime = new JLabel("TIME");
+		lblTime.setBounds(198, 283, 46, 14);
+		return lblTime;
+	}
+
+	private JLabel labelScore() {
+		JLabel lblScore = new JLabel("SCORE");
+		lblScore.setBounds(198, 233, 46, 14);
+		return lblScore;
+	}
+
+	private JButton buttonClear() {
+		JButton btnClear = new JButton("CLEAR");
+		btnClear.setBounds(462, 169, 71, 40);
+		return btnClear;
+	}
+
+	private JButton buttonLastWord() {
+		JButton btnLastWord = new JButton("Last Word");
+		btnLastWord.setBounds(381, 169, 71, 40);
+		return btnLastWord;
+	}
+
+	private JButton buttonEnter() {
+		JButton btnEnter = new JButton("Enter");
+		btnEnter.setBounds(300, 169, 71, 40);
+		return btnEnter;
+	}
+
+	private JButton buttonTwist() {
+		JButton btnTwist = new JButton("Twist");
+		btnTwist.setBounds(219, 169, 71, 40);
+		return btnTwist;
 	}
 
 	private JMenuBar menuBar() {
@@ -72,5 +154,4 @@ public class TeamProject extends JFrame {
 		menuBar.add(menuOptions);
 		return menuBar;
 	}
-
 }
