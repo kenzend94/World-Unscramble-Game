@@ -1,0 +1,13 @@
+egg
+elm
+emu
+gel
+gem
+gum
+leg
+lug
+mug
+glue
+glum
+mule
+muggle

@@ -1,0 +1,8 @@
+def
+die
+fed
+fez
+fie
+zed
+fizz
+fizzed

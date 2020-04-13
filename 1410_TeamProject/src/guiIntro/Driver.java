@@ -8,8 +8,8 @@ public class Driver {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		WordFiles files = new WordFiles("../.textfiles/2of12inf.txt");
-		System.out.println(files.getWords());
+		// WordFiles files = new WordFiles("../.textfiles/2of12inf.txt");
+		// System.out.println(files.getWords());
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

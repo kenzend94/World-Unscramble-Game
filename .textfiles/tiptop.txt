@@ -1,0 +1,11 @@
+opt
+pip
+pit
+poi
+pop
+pot
+tip
+tit
+top
+tot
+tiptop

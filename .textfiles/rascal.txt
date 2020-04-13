@@ -1,0 +1,12 @@
+arc
+car
+lac
+las
+sac
+alas
+arcs
+cars
+lacs
+scar
+sacra
+rascal

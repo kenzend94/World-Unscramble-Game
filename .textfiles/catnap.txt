@@ -1,0 +1,15 @@
+act
+ant
+apt
+can
+cap
+cat
+nap
+pan
+pat
+tan
+tap
+cant
+pact
+pant
+catnap

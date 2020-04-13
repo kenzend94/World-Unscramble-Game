@@ -1,0 +1,4 @@
+tee
+cede
+teed
+detect
