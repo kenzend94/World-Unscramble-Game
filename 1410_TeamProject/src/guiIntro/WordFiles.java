@@ -19,18 +19,22 @@ public class WordFiles {
 	private List<String> words;
 	private TreeSet<String> gameWords;
 	private List<String> results;
+	private List<String> sixLetterWords;
 	
 	/**
 	 * Constructor for WordFiles to create a lot of word file to be used in the game.
 	 * 
 	 * @param filename a filename to find all of the words from
 	 */
-	WordFiles(String filename) {
+	WordFiles(String filename, boolean install) {
 		words = new LinkedList<String>();
 		gameWords = new TreeSet<String>();
 		results = new LinkedList<String>();
+		sixLetterWords = new LinkedList<String>();
 		getGameWordsFromTextFile(filename);
-		createWordFiles();
+		if (install) {
+			createWordFiles();
+		}
 	}
 	
 	/**
@@ -43,6 +47,11 @@ public class WordFiles {
 			stream.forEach(x -> {x.replaceAll("[^A-Za-z0-9]",""); if (x.length() <= 6) words.add(x.toLowerCase());});
 		} catch (IOException e) {
 			System.out.print(e);
+		}
+		for (String word : words) {
+			if (word.length() == 6) {
+				sixLetterWords.add(word);
+			}
 		}
 	}
 	
@@ -127,8 +136,8 @@ public class WordFiles {
 	 * 
 	 * @return the list of all words
 	 */
-	public List<String> getWords() {
-		return this.words;
+	public List<String> getSixLetterWords() {
+		return this.sixLetterWords;
 	}
 
 }
