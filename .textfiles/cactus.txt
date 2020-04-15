@@ -1,0 +1,13 @@
+act
+cat
+cut
+sac
+sat
+tau
+acts
+cast
+cats
+cuts
+scat
+taus
+cactus

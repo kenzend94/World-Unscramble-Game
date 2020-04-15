@@ -1,0 +1,15 @@
+air
+arc
+bar
+bra
+cab
+car
+far
+fib
+fir
+rib
+barf
+crab
+crib
+fair
+fabric

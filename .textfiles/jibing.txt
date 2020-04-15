@@ -1,0 +1,7 @@
+big
+bin
+gin
+jib
+jig
+nib
+jibing

@@ -1,0 +1,6 @@
+gin
+mix
+nix
+mini
+minx
+mixing

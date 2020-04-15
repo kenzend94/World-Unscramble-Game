@@ -1,0 +1,9 @@
+Word Unscrambler
+
+For our project, we will be creating a game that allows users to unscramble six letter words.
+The goal of the game is to unscramble all possible words made from the six letter word. Players
+will have 2 minutes to unscramble all of the words or 2:30 to unscramble words when there are
+more than 20 of them. The user advances on to the next round if they have unscrambled at least
+one of the six letter words. If not, it's game over. A score will be kept after each round so
+the more words a user unscrambles, the higher their score. The game is over when the player
+cannot unscramble a 6 letter word in the time, or the player decides to quit.

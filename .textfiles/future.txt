@@ -1,0 +1,8 @@
+fur
+ref
+rue
+rut
+fret
+true
+turf
+future

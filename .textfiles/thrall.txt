@@ -1,0 +1,12 @@
+all
+art
+hat
+rah
+rat
+tar
+hall
+halt
+hart
+lath
+tall
+thrall

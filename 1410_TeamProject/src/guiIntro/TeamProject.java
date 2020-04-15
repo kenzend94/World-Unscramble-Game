@@ -1,40 +1,35 @@
 package guiIntro;
 
-import java.awt.EventQueue;
+import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-public class TeamProject extends JFrame {
+public class TeamProject extends JFrame{
 	
 	private JPanel contentPane;
+	public static LinkedHashMap<String, Boolean> gameWords;
+	private List<String> sixLetterWords;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TeamProject frame = new TeamProject();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+    
 	/**
 	 * Create the frame.
 	 */
-	public TeamProject() {
+	public TeamProject(List<String> sixLetterWords) {
+		this.sixLetterWords = sixLetterWords;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 683, 402);
 		
@@ -73,8 +68,18 @@ public class TeamProject extends JFrame {
 		JLabel lblMessage = labelMessage();
 		contentPane.add(lblMessage);
 		
+		JLabel lblTimer = labelTimer();
+		contentPane.add(lblTimer);
+		
 		//String name = JOptionPane.showInputDialog("Please enter your name below:");
 		//label.setText(name);
+	}
+
+	private JLabel labelTimer() {
+		JLabel lblTimer = new JLabel("00 : 00 : 00");
+		lblTimer.setBounds(327, 311, 46, 14);
+		
+		return lblTimer;
 	}
 
 	private JLabel labelMessage() {

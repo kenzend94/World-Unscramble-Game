@@ -1,0 +1,9 @@
+act
+ant
+can
+cat
+tan
+van
+vat
+cant
+vacant

@@ -1,0 +1,10 @@
+bid
+dim
+mid
+rib
+rid
+rim
+bird
+brim
+midi
+midrib

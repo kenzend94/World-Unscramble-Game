@@ -1,0 +1,8 @@
+bib
+bin
+bio
+bob
+ion
+nib
+obi
+bobbin
