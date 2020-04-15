@@ -1,15 +1,13 @@
 package guiIntro;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
@@ -38,13 +36,10 @@ public class TeamProject extends JFrame {
 	 */
 	public TeamProject() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 584, 402);
+		setBounds(100, 100, 683, 402);
 		
 		JMenuBar menuBar = menuBar();
 		setJMenuBar(menuBar);
-		
-		
-		
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -75,9 +70,17 @@ public class TeamProject extends JFrame {
 		JLabel label = labelYourName();
 		contentPane.add(label);
 		
-		String name = JOptionPane.showInputDialog("Please enter your name below:");
-		label.setText(name);
+		JLabel lblMessage = labelMessage();
+		contentPane.add(lblMessage);
 		
+		//String name = JOptionPane.showInputDialog("Please enter your name below:");
+		//label.setText(name);
+	}
+
+	private JLabel labelMessage() {
+		JLabel lblMessage = new JLabel("");
+		lblMessage.setBounds(408, 236, 230, 81);
+		return lblMessage;
 	}
 
 	private JLabel labelYourName() {		
@@ -94,37 +97,37 @@ public class TeamProject extends JFrame {
 
 	private JLabel labelTime() {
 		JLabel lblTime = new JLabel("TIME");
-		lblTime.setBounds(198, 283, 46, 14);
+		lblTime.setBounds(327, 286, 46, 14);
 		return lblTime;
 	}
 
 	private JLabel labelScore() {
 		JLabel lblScore = new JLabel("SCORE");
-		lblScore.setBounds(198, 233, 46, 14);
+		lblScore.setBounds(327, 236, 46, 14);
 		return lblScore;
 	}
 
 	private JButton buttonClear() {
 		JButton btnClear = new JButton("CLEAR");
-		btnClear.setBounds(462, 169, 71, 40);
+		btnClear.setBounds(570, 168, 71, 40);
 		return btnClear;
 	}
 
 	private JButton buttonLastWord() {
 		JButton btnLastWord = new JButton("Last Word");
-		btnLastWord.setBounds(381, 169, 71, 40);
+		btnLastWord.setBounds(489, 168, 71, 40);
 		return btnLastWord;
 	}
 
 	private JButton buttonEnter() {
 		JButton btnEnter = new JButton("Enter");
-		btnEnter.setBounds(300, 169, 71, 40);
+		btnEnter.setBounds(408, 168, 71, 40);
 		return btnEnter;
 	}
 
 	private JButton buttonTwist() {
 		JButton btnTwist = new JButton("Twist");
-		btnTwist.setBounds(219, 169, 71, 40);
+		btnTwist.setBounds(327, 168, 71, 40);
 		return btnTwist;
 	}
 
@@ -152,6 +155,7 @@ public class TeamProject extends JFrame {
 		
 		menuBar.add(menuFile);
 		menuBar.add(menuOptions);
+		
 		return menuBar;
 	}
 }
