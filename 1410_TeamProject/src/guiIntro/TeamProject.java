@@ -1,7 +1,6 @@
 package guiIntro;
 
 import java.awt.event.ActionListener;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,17 +11,25 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
+/**
+ * GUI application
+ * @author Khoi Nguyen
+ *
+ */
 public class TeamProject extends JFrame{
 	
 	private JPanel contentPane;
 	public static LinkedHashMap<String, Boolean> gameWords;
 	private List<String> sixLetterWords;
+	
+	Timer timer;
 
     
 	/**
@@ -76,8 +83,27 @@ public class TeamProject extends JFrame{
 	}
 
 	private JLabel labelTimer() {
-		JLabel lblTimer = new JLabel("00 : 00 : 00");
+		JLabel lblTimer = new JLabel("03:00");
 		lblTimer.setBounds(327, 311, 46, 14);
+		
+		
+		timer = new Timer(1000, new ActionListener() {
+			int time = 180;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				time--;
+				lblTimer.setText(String.format("%02d:%02d", time / 60, time % 60));
+				if (time == 0) {
+					final Timer timer = (Timer) e.getSource();
+					timer.stop();
+					JOptionPane.showMessageDialog(contentPane, "Time's up.");
+				}
+			}
+			
+		});
+		
+	    timer.start();
 		
 		return lblTimer;
 	}
