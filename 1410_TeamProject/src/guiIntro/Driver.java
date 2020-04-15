@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 import java.util.List;
 
 /**
- * Class Driver.
+ * Class Driver will run the GUI application.
  * @author Michael Kamerath
  *
  */
