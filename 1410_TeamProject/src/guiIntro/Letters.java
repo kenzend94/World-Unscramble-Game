@@ -2,7 +2,11 @@ package guiIntro;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * Class Letters.java
+ * @author Khoi Nguyen
+ *
+ */
 public class Letters {
 	private static final String TAG = "repositorie.Letters";
 
