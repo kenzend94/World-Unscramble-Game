@@ -1,0 +1,12 @@
+ant
+sat
+tan
+van
+vat
+ants
+tans
+vans
+vast
+vats
+avast
+savant

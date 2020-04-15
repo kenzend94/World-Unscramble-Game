@@ -1,0 +1,6 @@
+ant
+sat
+tan
+ants
+tans
+stanza

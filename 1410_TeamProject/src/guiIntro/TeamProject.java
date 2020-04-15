@@ -2,6 +2,8 @@ package guiIntro;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -16,27 +18,15 @@ import javax.swing.JLabel;
 public class TeamProject extends JFrame {
 	
 	private JPanel contentPane;
+	public static LinkedHashMap<String, Boolean> gameWords;
+	private List<String> sixLetterWords;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TeamProject frame = new TeamProject();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
 	 */
-	public TeamProject() {
+	public TeamProject(List<String> sixLetterWords) {
+		this.sixLetterWords = sixLetterWords;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 584, 402);
 		

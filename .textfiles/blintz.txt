@@ -1,0 +1,13 @@
+bin
+bit
+biz
+lib
+lit
+nib
+nil
+nit
+tin
+zit
+lint
+blitz
+blintz

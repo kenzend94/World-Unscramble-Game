@@ -1,0 +1,15 @@
+all
+arc
+car
+lac
+oar
+orc
+call
+coal
+cola
+oral
+roll
+carol
+coral
+local
+collar

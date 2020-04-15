@@ -1,0 +1,8 @@
+act
+cat
+cut
+qua
+tau
+tic
+quit
+acquit

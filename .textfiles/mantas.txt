@@ -1,0 +1,15 @@
+ant
+man
+mas
+mat
+sat
+tam
+tan
+ants
+mans
+mast
+mats
+tams
+tans
+manta
+mantas

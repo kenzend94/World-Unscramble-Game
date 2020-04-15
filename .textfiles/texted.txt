@@ -1,0 +1,4 @@
+tee
+teed
+text
+texted
