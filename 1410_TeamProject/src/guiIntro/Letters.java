@@ -3,12 +3,11 @@ package guiIntro;
 import java.util.HashMap;
 import java.util.Map;
 /**
- * Class Letters.java
+ * Class Letters.java will store the link to the letters PNG file.
  * @author Khoi Nguyen
  *
  */
 public class Letters {
-	private static final String TAG = "repositorie.Letters";
 
     private Map<Character, String> letters;
 
