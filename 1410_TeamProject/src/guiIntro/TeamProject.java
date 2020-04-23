@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 /**
  * GUI application
@@ -54,7 +55,7 @@ public class TeamProject extends JFrame{
 	public TeamProject(List<String> sixLetterWords) {
 		this.allSixLetterWords = sixLetterWords;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 754, 446);
+		setBounds(100, 100, 754, 583);
 		
 		randNum = new Random();
 		
@@ -142,8 +143,8 @@ public class TeamProject extends JFrame{
 		
 		newRound();
 		
-		String name = JOptionPane.showInputDialog("Please enter your name below:");
-		label.setText(name);
+		//String name = JOptionPane.showInputDialog("Please enter your name below:");
+		//label.setText(name);
 	}
 	
 	/**
@@ -154,7 +155,7 @@ public class TeamProject extends JFrame{
 		JLabel[] lblPossibleLetters = new JLabel[WORD_SIZE];
 		for (int i = 0; i < WORD_SIZE; ++i) {
 			lblPossibleLetters[i] = new JLabel("");
-			lblPossibleLetters[i].setBounds(60*i+375, 110, 40, 40);
+			lblPossibleLetters[i].setBounds(60*i+375, 220, 40, 40);
 			//lblPossibleLetters[i].setBounds(40*i+375, 110, 40, 40);
 		}
 		return lblPossibleLetters;
@@ -177,7 +178,7 @@ public class TeamProject extends JFrame{
 
 	private JLabel labelTimer() {
 		JLabel lblTimer = new JLabel("03:00");
-		lblTimer.setBounds(327, 311, 46, 14);
+		lblTimer.setBounds(327, 473, 46, 14);
 		
 		
 		timer = new Timer(1000, new ActionListener() {
@@ -215,7 +216,7 @@ public class TeamProject extends JFrame{
 
 	private JLabel labelMessage() {
 		JLabel lblMessage = new JLabel("");
-		lblMessage.setBounds(408, 236, 230, 81);
+		lblMessage.setBounds(460, 308, 230, 81);
 		return lblMessage;
 	}
 
@@ -233,31 +234,31 @@ public class TeamProject extends JFrame{
 
 	private JLabel labelTime() {
 		JLabel lblTime = new JLabel("TIME");
-		lblTime.setBounds(327, 286, 46, 14);
+		lblTime.setBounds(327, 448, 46, 14);
 		return lblTime;
 	}
 
 	private JLabel labelScore() {
 		JLabel lblScore = new JLabel("SCORE");
-		lblScore.setBounds(327, 236, 46, 14);
+		lblScore.setBounds(327, 398, 46, 14);
 		return lblScore;
 	}
 
 	private JButton buttonClear() {
 		JButton btnClear = new JButton("CLEAR");
-		btnClear.setBounds(641, 168, 87, 40);
+		btnClear.setBounds(641, 312, 87, 40);
 		return btnClear;
 	}
 
 	private JButton buttonLastWord() {
 		JButton btnLastWord = new JButton("Last Word");
-		btnLastWord.setBounds(516, 168, 104, 40);
+		btnLastWord.setBounds(516, 312, 104, 40);
 		return btnLastWord;
 	}
 
 	private JButton buttonEnter() {
 		JButton btnEnter = new JButton("Enter");
-		btnEnter.setBounds(421, 168, 71, 40);
+		btnEnter.setBounds(421, 312, 71, 40);
 		return btnEnter;
 	}
 
@@ -267,7 +268,7 @@ public class TeamProject extends JFrame{
 	 */
 	private JButton buttonTwist() {
 		JButton btnTwist = new JButton("Twist");
-		btnTwist.setBounds(327, 168, 71, 40);
+		btnTwist.setBounds(327, 312, 71, 40);
 		btnTwist.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Collections.shuffle(gameWordChars);
