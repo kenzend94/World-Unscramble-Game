@@ -1,9 +1,15 @@
 package guiIntro;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -15,6 +21,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
@@ -26,8 +33,17 @@ import javax.swing.JLabel;
 public class TeamProject extends JFrame{
 	
 	private JPanel contentPane;
-	public static LinkedHashMap<String, Boolean> gameWords;
-	private List<String> sixLetterWords;
+	private LinkedHashMap<String, Boolean> gameWords;
+	private String[] roundSixLetterWords;
+	private List<String> allSixLetterWords;
+	private ArrayList<JLabel> guessedWords;
+	private JLabel[] guessLetters;
+	private JLabel[] possibleLetters;
+	private final int WORD_SIZE = 6;
+	private List<Character> gameWordChars;
+	private List<Character> guessWordChars;
+	private JLabel lblTimer;
+	private Random randNum;
 	
 	Timer timer;
 
@@ -36,17 +52,53 @@ public class TeamProject extends JFrame{
 	 * Create the frame.
 	 */
 	public TeamProject(List<String> sixLetterWords) {
-		this.sixLetterWords = sixLetterWords;
+		this.allSixLetterWords = sixLetterWords;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 683, 402);
 		
+		randNum = new Random();
+		
 		JMenuBar menuBar = menuBar();
 		setJMenuBar(menuBar);
+		gameWordChars = new ArrayList<Character>();
+		guessWordChars = new ArrayList<Character>();
 		
 		contentPane = new JPanel();
+		contentPane.setFocusable(true);
+		contentPane.requestFocusInWindow();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBackground(new Color(255, 211, 1));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
+		contentPane.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {}
+			@Override
+			public void keyReleased(KeyEvent e) {}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// Move letter from possible label to guess label if it is one of the possible letter.
+				if (gameWordChars.contains(e.getKeyChar())) {
+					moveLettersUp(e);
+				}
+				// Sends last letter from guess label back down to possible label.
+				else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+					if (!guessWordChars.isEmpty()) {
+						char temp = guessWordChars.get(guessWordChars.size() - 1);
+						guessWordChars.remove(guessWordChars.size() - 1);
+						gameWordChars.add(temp);
+						updateCharacterLabels();
+					}
+				}
+			}
+			private void moveLettersUp(KeyEvent e) {
+				gameWordChars.remove((Character)e.getKeyChar());
+				guessWordChars.add(e.getKeyChar());
+				updateCharacterLabels();
+			}
+		});
 		
 		JButton btnTwist = buttonTwist();
 		contentPane.add(btnTwist);
@@ -75,11 +127,50 @@ public class TeamProject extends JFrame{
 		JLabel lblMessage = labelMessage();
 		contentPane.add(lblMessage);
 		
-		JLabel lblTimer = labelTimer();
+		lblTimer = labelTimer();
 		contentPane.add(lblTimer);
+		
+		possibleLetters = labelPossibleLetters();
+		for (JLabel lbl : possibleLetters) {
+			contentPane.add(lbl);
+		}
+		
+		guessLetters = labelGuessLetters();
+		for (JLabel lbl : guessLetters) {
+			contentPane.add(lbl);
+		}
+		
+		newRound();
 		
 		//String name = JOptionPane.showInputDialog("Please enter your name below:");
 		//label.setText(name);
+	}
+	
+	/**
+	 * @author Michael Kamerath
+	 * @return list of labels of the letters in the guess word
+	 */
+	private JLabel[] labelPossibleLetters() {
+		JLabel[] lblPossibleLetters = new JLabel[WORD_SIZE];
+		for (int i = 0; i < WORD_SIZE; ++i) {
+			lblPossibleLetters[i] = new JLabel("");
+			lblPossibleLetters[i].setBounds(40*i+375, 110, 40, 40);
+		}
+		return lblPossibleLetters;
+	}
+	
+	/**
+	 * @author Michael Kamerath
+	 * @return list of possible guess letters
+	 */
+	private JLabel[] labelGuessLetters() {
+		JLabel[] lblGuessLetters = new JLabel[WORD_SIZE];
+		for (int i = 0; i < WORD_SIZE; ++i) {
+			lblGuessLetters[i] = new JLabel("");
+			lblGuessLetters[i].setBounds(40*i+375, 40, 40, 40);
+		}
+		
+		return lblGuessLetters;
 	}
 
 	private JLabel labelTimer() {
@@ -97,7 +188,19 @@ public class TeamProject extends JFrame{
 				if (time == 0) {
 					final Timer timer = (Timer) e.getSource();
 					timer.stop();
-					JOptionPane.showMessageDialog(contentPane, "Time's up.");
+					boolean goToNextRound = false;
+					for (String word : roundSixLetterWords) {
+						if (gameWords.get(word)) {
+							goToNextRound = true;
+							break;
+						}
+					}
+					if (goToNextRound) {
+						newRound();
+					}
+					else {
+						JOptionPane.showMessageDialog(contentPane, "Time's up.");
+					}
 				}
 			}
 			
@@ -156,9 +259,22 @@ public class TeamProject extends JFrame{
 		return btnEnter;
 	}
 
+	/**
+	 * @author Michael Kamerath Khoi Nguyen
+	 * @return Twist Button
+	 */
 	private JButton buttonTwist() {
 		JButton btnTwist = new JButton("Twist");
 		btnTwist.setBounds(327, 168, 71, 40);
+		btnTwist.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Collections.shuffle(gameWordChars);
+				for (int i = 0; i < gameWordChars.size(); ++i) {
+					possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
+				}
+				contentPane.requestFocusInWindow();
+			}
+		});
 		return btnTwist;
 	}
 
@@ -188,5 +304,48 @@ public class TeamProject extends JFrame{
 		menuBar.add(menuOptions);
 		
 		return menuBar;
+	}
+	
+	/**
+	 * @author Michael Kamerath
+	 */
+	private void newRound() {
+		// Resetting variables
+		gameWordChars.clear();
+		
+		
+		int position = this.randNum.nextInt(this.allSixLetterWords.size());
+		String gameWord = allSixLetterWords.get(position);
+		System.out.println(gameWord);
+		for (int i = 0; i < gameWord.length(); ++i) {
+			gameWordChars.add(gameWord.charAt(i));
+		}
+		Collections.shuffle(gameWordChars);
+		
+		for (int i = 0; i < gameWordChars.size(); ++i) {
+			possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
+		}
+		
+	}
+	
+	/**
+	 * @author Michael Kamerath
+	 */
+	private void updateCharacterLabels() {
+		for (int i = 0; i < guessWordChars.size(); ++i) {
+			guessLetters[i].setIcon(new ImageIcon("Resources/letters/" + guessWordChars.get(i) + ".png"));
+		}
+		
+		for (int i = guessWordChars.size(); i < gameWordChars.size() + guessWordChars.size(); ++i) {
+			guessLetters[i].setIcon(null);
+		}
+		
+		for (int i = 0; i < gameWordChars.size(); ++i) {
+			possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
+		}
+		
+		for (int i = gameWordChars.size(); i < gameWordChars.size() + guessWordChars.size(); ++i) {
+			possibleLetters[i].setIcon(null);
+		}
 	}
 }
