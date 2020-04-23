@@ -54,7 +54,7 @@ public class TeamProject extends JFrame{
 	public TeamProject(List<String> sixLetterWords) {
 		this.allSixLetterWords = sixLetterWords;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 683, 402);
+		setBounds(100, 100, 754, 446);
 		
 		randNum = new Random();
 		
@@ -142,8 +142,8 @@ public class TeamProject extends JFrame{
 		
 		newRound();
 		
-		//String name = JOptionPane.showInputDialog("Please enter your name below:");
-		//label.setText(name);
+		String name = JOptionPane.showInputDialog("Please enter your name below:");
+		label.setText(name);
 	}
 	
 	/**
@@ -154,7 +154,8 @@ public class TeamProject extends JFrame{
 		JLabel[] lblPossibleLetters = new JLabel[WORD_SIZE];
 		for (int i = 0; i < WORD_SIZE; ++i) {
 			lblPossibleLetters[i] = new JLabel("");
-			lblPossibleLetters[i].setBounds(40*i+375, 110, 40, 40);
+			lblPossibleLetters[i].setBounds(60*i+375, 110, 40, 40);
+			//lblPossibleLetters[i].setBounds(40*i+375, 110, 40, 40);
 		}
 		return lblPossibleLetters;
 	}
@@ -167,7 +168,8 @@ public class TeamProject extends JFrame{
 		JLabel[] lblGuessLetters = new JLabel[WORD_SIZE];
 		for (int i = 0; i < WORD_SIZE; ++i) {
 			lblGuessLetters[i] = new JLabel("");
-			lblGuessLetters[i].setBounds(40*i+375, 40, 40, 40);
+			lblGuessLetters[i].setBounds(60*i+375, 40, 40, 40);
+			//lblGuessLetters[i].setBounds(40*i+375, 40, 40, 40);
 		}
 		
 		return lblGuessLetters;
@@ -243,19 +245,19 @@ public class TeamProject extends JFrame{
 
 	private JButton buttonClear() {
 		JButton btnClear = new JButton("CLEAR");
-		btnClear.setBounds(570, 168, 71, 40);
+		btnClear.setBounds(641, 168, 87, 40);
 		return btnClear;
 	}
 
 	private JButton buttonLastWord() {
 		JButton btnLastWord = new JButton("Last Word");
-		btnLastWord.setBounds(489, 168, 71, 40);
+		btnLastWord.setBounds(516, 168, 104, 40);
 		return btnLastWord;
 	}
 
 	private JButton buttonEnter() {
 		JButton btnEnter = new JButton("Enter");
-		btnEnter.setBounds(408, 168, 71, 40);
+		btnEnter.setBounds(421, 168, 71, 40);
 		return btnEnter;
 	}
 
