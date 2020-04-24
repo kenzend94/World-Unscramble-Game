@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 /**
  * GUI application
@@ -31,26 +32,19 @@ import javax.swing.JLabel;
  *
  */
 public class TeamProject extends JFrame{
-	private final int WORD_SIZE = 6;
-	private static final int SCORE_THRESHOLD = 170; 	// [TAG] - Khoi Nguyen
-
+	
 	private JPanel contentPane;
-	private JLabel[] guessLetters;
-	private JLabel[] possibleLetters;
-	private JLabel lblTimer;
+	private LinkedHashMap<String, Boolean> gameWords;
 	private String[] roundSixLetterWords;
 	private List<String> allSixLetterWords;
-	private List<String> correctAnswers;				// [TAG] - Khoi Nguyen
-	private LinkedHashMap<String, Boolean> gameWords;
 	private ArrayList<JLabel> guessedWords;
+	private JLabel[] guessLetters;
+	private JLabel[] possibleLetters;
+	private final int WORD_SIZE = 6;
 	private List<Character> gameWordChars;
 	private List<Character> guessWordChars;
+	private JLabel lblTimer;
 	private Random randNum;
-	private String answer;	 							// [TAG] - Khoi Nguyen
-	private int score;									// [TAG] - Khoi Nguyen
-	private static int previousTime;					// [TAG] - Khoi Nguyen
-	private List<Character> lastWord;					// [TAG] - Khoi Nguyen
-	
 	
 	Timer timer;
 
@@ -69,8 +63,6 @@ public class TeamProject extends JFrame{
 		setJMenuBar(menuBar);
 		gameWordChars = new ArrayList<Character>();
 		guessWordChars = new ArrayList<Character>();
-		lastWord = new ArrayList<Character>(); 			// [TAG] - Khoi Nguyen
-		correctAnswers = new ArrayList<String>();		// [TAG] - Khoi Nguyen
 		
 		contentPane = new JPanel();
 		contentPane.setFocusable(true);
@@ -137,8 +129,8 @@ public class TeamProject extends JFrame{
 		contentPane.add(lblMessage);
 		
 		lblTimer = labelTimer();
-		contentPane.add(lblTimer);	
-				
+		contentPane.add(lblTimer);
+		
 		possibleLetters = labelPossibleLetters();
 		for (JLabel lbl : possibleLetters) {
 			contentPane.add(lbl);
@@ -151,12 +143,9 @@ public class TeamProject extends JFrame{
 		
 		newRound();
 		
-		timer.stop();
-		String name = JOptionPane.showInputDialog("Please enter your name below:");
-		label.setText(name);
-		timer.start();
+		//String name = JOptionPane.showInputDialog("Please enter your name below:");
+		//label.setText(name);
 	}
-	
 	
 	/**
 	 * @author Michael Kamerath
@@ -190,6 +179,7 @@ public class TeamProject extends JFrame{
 	private JLabel labelTimer() {
 		JLabel lblTimer = new JLabel("03:00");
 		lblTimer.setBounds(327, 473, 46, 14);
+		
 		
 		timer = new Timer(1000, new ActionListener() {
 			int time = 180;
@@ -232,7 +222,7 @@ public class TeamProject extends JFrame{
 
 	private JLabel labelYourName() {		
 		JLabel label = new JLabel("");
-		label.setBounds(49, 11, 96, 14);
+		label.setBounds(49, 11, 46, 14);
 		return label;
 	}
 
@@ -248,170 +238,32 @@ public class TeamProject extends JFrame{
 		return lblTime;
 	}
 
-	/**
-	 * @author Khoi Nguyen
-	 * @return the score 
-	 */
 	private JLabel labelScore() {
 		JLabel lblScore = new JLabel("SCORE");
-		lblScore.setBounds(327, 398, 100, 14);
-		Timer t = new Timer(200, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				lblScore.setText("SCORE   " + String.valueOf(score));	
-			}
-		});
-		t.start();
+		lblScore.setBounds(327, 398, 46, 14);
 		return lblScore;
 	}
 
-	/**
-	 * @author Khoi Nguyen
-	 * @return clear the word typed on the GUI.
-	 */
 	private JButton buttonClear() {
 		JButton btnClear = new JButton("CLEAR");
 		btnClear.setBounds(641, 312, 87, 40);
-		btnClear.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				for (int i = 0; i < guessWordChars.size(); ++i) 
-					guessLetters[i].setIcon(null);
-
-				
-				char[] chars = getString(guessWordChars).toCharArray();
-				for(char c : chars)
-					gameWordChars.add(c); 
-				
-				guessWordChars.clear();
-				for (int i = 0; i < gameWordChars.size(); ++i) 
-					possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
-				
-				contentPane.requestFocusInWindow();
-			}
-			
-		});
 		return btnClear;
 	}
 
-	/**
-	 * @author Khoi Nguyen
-	 * @return the last word typed
-	 */
 	private JButton buttonLastWord() {
 		JButton btnLastWord = new JButton("Last Word");
 		btnLastWord.setBounds(516, 312, 104, 40);
-		btnLastWord.addActionListener( new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (!guessWordChars.isEmpty())
-				{
-					JOptionPane.showMessageDialog(contentPane, "Can't show the last word until the guessing area is clear!", "Warning:", JOptionPane.ERROR_MESSAGE);
-					contentPane.requestFocusInWindow();
-					return;
-				}
-				
-				if(lastWord.isEmpty())
-				{
-					JOptionPane.showMessageDialog(contentPane, "You have not taken any guess!", "Warning:", JOptionPane.ERROR_MESSAGE);
-					contentPane.requestFocusInWindow();
-					return;
-				}
-				
-				for (int i = 0; i < gameWordChars.size(); ++i) 
-					possibleLetters[i].setIcon(null);
-
-				
-				char[] chars = getString(lastWord).toCharArray();
-				for(char c : chars)
-					guessWordChars.add(c); 
-				
-				gameWordChars.clear();
-				
-				for (int i = 0; i < guessWordChars.size(); ++i) 
-					guessLetters[i].setIcon(new ImageIcon("Resources/letters/" + guessWordChars.get(i) + ".png"));
-				
-				contentPane.requestFocusInWindow();
-			}
-			
-		});
 		return btnLastWord;
 	}
 
-	/**
-	 * @author Khoi Nguyen
-	 * @return the right or wrong of the guess word.
-	 */
 	private JButton buttonEnter() {
 		JButton btnEnter = new JButton("Enter");
 		btnEnter.setBounds(421, 312, 71, 40);
-		btnEnter.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println(guessWordChars.toString());
-				if (guessWordChars.size() != WORD_SIZE)
-				{
-					JOptionPane.showMessageDialog(contentPane, "Guess again!", "Result:", JOptionPane.INFORMATION_MESSAGE);
-					contentPane.requestFocusInWindow();
-					return;
-				}
-				
-				if(getString(guessWordChars).equals(answer))
-				{
-					// Output score
-					score += calculateScoreBasedOnTime(lblTimer.getText());
-					System.out.println(score);
-					
-					correctAnswers.add(answer);
-					for(int i = 0; i < correctAnswers.size(); i++)
-					{
-						System.out.println(correctAnswers.get(i));
-						String ans = correctAnswers.get(i);
-						char[] chars = ans.toCharArray();
-						for(int j = 0; j < chars.length; j++)
-						{
-							JLabel label = new JLabel("");
-							label.setBounds(42*j + 20, 475 - 43*i, 40, 40);
-							label.setIcon(new ImageIcon("Resources/letters/" + chars[j] + ".png"));
-							contentPane.add(label);
-							contentPane.repaint();
-							System.out.println(chars[j] + "\n");
-						}
-					}
-					
-					JOptionPane.showMessageDialog(contentPane, "Correct word!", "Result:", JOptionPane.INFORMATION_MESSAGE);
-					// Advance to the next word
-					newRound();
-				}
-				else
-				{
-					lastWord.clear();
-					for (int i = 0; i < guessWordChars.size(); ++i) 
-						guessLetters[i].setIcon(null);
-					
-					char[] chars = getString(guessWordChars).toCharArray();
-					for(char c : chars)
-					{
-						gameWordChars.add(c); 
-						lastWord.add(c);
-					}
-					Collections.shuffle(gameWordChars);
-					guessWordChars.clear();
-					
-					for (int i = 0; i < gameWordChars.size(); ++i) 
-						possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
-					
-					
-					JOptionPane.showMessageDialog(contentPane, "Guess again!", "Result:", JOptionPane.INFORMATION_MESSAGE);
-				}
-				contentPane.requestFocusInWindow();
-			}
-		});
 		return btnEnter;
 	}
 
 	/**
-	 * @author Michael Kamerath & Khoi Nguyen
+	 * @author Michael Kamerath Khoi Nguyen
 	 * @return Twist Button
 	 */
 	private JButton buttonTwist() {
@@ -463,23 +315,18 @@ public class TeamProject extends JFrame{
 	private void newRound() {
 		// Resetting variables
 		gameWordChars.clear();
-		lastWord.clear(); 				// [TAG] - Khoi Nguyen
-		guessWordChars.clear(); 		// [TAG] - Khoi Nguyen
+		
 		
 		int position = this.randNum.nextInt(this.allSixLetterWords.size());
-		answer = allSixLetterWords.get(position);					// [TAG] - Khoi Nguyen
-		System.out.println(answer);									// [TAG] - Khoi Nguyen
-		for (int i = 0; i < answer.length(); ++i) {					// [TAG] - Khoi Nguyen
-			gameWordChars.add(answer.charAt(i));					// [TAG] - Khoi Nguyen
+		String gameWord = allSixLetterWords.get(position);
+		System.out.println(gameWord);
+		for (int i = 0; i < gameWord.length(); ++i) {
+			gameWordChars.add(gameWord.charAt(i));
 		}
 		Collections.shuffle(gameWordChars);
 		
 		for (int i = 0; i < gameWordChars.size(); ++i) {
 			possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
-		}
-		
-		for (int i = 0; i < WORD_SIZE; ++i) {
-			guessLetters[i].setIcon(null);
 		}
 		
 	}
@@ -504,61 +351,4 @@ public class TeamProject extends JFrame{
 			possibleLetters[i].setIcon(null);
 		}
 	}
-	
-	/**
-	 * @author Khoi Nguyen
-	 * @param list
-	 * @return
-	 */
-	private static String getString(List<Character> list)
-	{    
-	    StringBuilder builder = new StringBuilder(list.size());
-	    for(Character ch: list)
-	    {
-	        builder.append(ch);
-	    }
-	    return builder.toString();
-	}
-	
-	/**
-	 * @author Khoi Nguyen
-	 * @param time
-	 * @return
-	 */
-	private static int convertTimeToSeconds(String time)
-	{
-		String[] comps = time.split(":");
-		int min = Integer.parseInt(comps[0]);
-		return min * 60 + Integer.parseInt(comps[1]);
-	}
-	
-	/**
-	 * @author Khoi Nguyen
-	 * @param timeS
-	 * @return
-	 */
-	private static int calculateScoreBasedOnTime(String timeS)
-	{
-		int time = convertTimeToSeconds(timeS);
-		
-		int timeSpentToSolve;
-		if (previousTime == 0)
-			timeSpentToSolve = SCORE_THRESHOLD - time;
-		else
-			timeSpentToSolve = previousTime - time;
-		previousTime = time;
-		
-		if (timeSpentToSolve < 10)
-			return 100;
-		else if (timeSpentToSolve < 15)
-			return 90;
-		else if (timeSpentToSolve < 25)
-			return 70;
-		else if (timeSpentToSolve < 45)
-			return 50;
-		else if (timeSpentToSolve < 70)
-			return 25;
-		return 0;
-	}
-	
 }
