@@ -3,6 +3,8 @@ package guiIntro;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -28,7 +31,7 @@ import javax.swing.JTextField;
 
 /**
  * GUI application
- * @author Khoi Nguyen
+ * @author Khoi Nguyen Michael Kamerath
  *
  */
 public class TeamProject extends JFrame{
@@ -61,6 +64,7 @@ public class TeamProject extends JFrame{
 		
 		JMenuBar menuBar = menuBar();
 		setJMenuBar(menuBar);
+		gameWords = new LinkedHashMap<String, Boolean>();
 		gameWordChars = new ArrayList<Character>();
 		guessWordChars = new ArrayList<Character>();
 		
@@ -315,6 +319,7 @@ public class TeamProject extends JFrame{
 	private void newRound() {
 		// Resetting variables
 		gameWordChars.clear();
+		gameWords.clear();
 		
 		
 		int position = this.randNum.nextInt(this.allSixLetterWords.size());
@@ -325,9 +330,18 @@ public class TeamProject extends JFrame{
 		}
 		Collections.shuffle(gameWordChars);
 		
-		for (int i = 0; i < gameWordChars.size(); ++i) {
-			possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
+		try (Scanner inFile = new Scanner(new FileReader("../.textfiles/" + gameWord + ".txt"))) {
+			String line = null;
+			while (inFile.hasNextLine()) {
+				line = inFile.nextLine();
+				gameWords.put(line, false);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
+		System.out.println(gameWords);
+		
+		updateCharacterLabels();
 		
 	}
 	
