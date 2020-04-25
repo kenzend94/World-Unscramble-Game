@@ -44,10 +44,10 @@ public class TeamProject extends JFrame{
 	private JLabel[] lblPossibleLetters;
 	private JLabel lblTimer;
 	private JLabel lblScore;
-	private ArrayList<String> roundSixLetterWords;
+	private List<String> roundSixLetterWords;
 	private List<String> allSixLetterWords;
 	private LinkedHashMap<String, Boolean> gameWords;
-	private ArrayList<JLabel> lblGuessedWords;
+	private List<JLabel> lblGuessedWords;
 	private List<Character> gameWordChars;
 	private List<Character> guessWordChars;
 	private Random randNum;
@@ -196,7 +196,7 @@ public class TeamProject extends JFrame{
 		JLabel[] lblGuessLetters = new JLabel[WORD_SIZE];
 		for (int i = 0; i < WORD_SIZE; ++i) {
 			lblGuessLetters[i] = new JLabel("");
-			lblGuessLetters[i].setBounds(60*i+375, 40, 40, 40);
+			lblGuessLetters[i].setBounds(60*i+375, 40, 45, 45);
 			lblGuessLetters[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 			lblGuessLetters[i].setBackground(Color.WHITE);
 			lblGuessLetters[i].setOpaque(true);
@@ -250,6 +250,11 @@ public class TeamProject extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				time--;
 				lblTimer.setText(String.format("%02d:%02d", time / 60, time % 60));
+				for (boolean value : gameWords.values()) {
+					if (!value) {
+						break;
+					}
+				}
 				if (time == 0) {
 					final Timer timer = (Timer) e.getSource();
 					timer.stop();
@@ -261,6 +266,7 @@ public class TeamProject extends JFrame{
 						}
 					}
 					if (goToNextRound) {
+						JOptionPane.showMessageDialog(contentPane, "Good job! next round");
 						newRound();
 					}
 					else {
@@ -461,6 +467,7 @@ public class TeamProject extends JFrame{
 	}
 	
 	private void newGame() {
+		timer.stop();
 		score = 0;
 		newRound();
 	}
