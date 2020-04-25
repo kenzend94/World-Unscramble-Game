@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  */
 public class WordFiles {
 	private List<String> words;
-	private TreeSet<String> gameWords;
+	private Set<String> gameWords;
 	private List<String> results;
 	private List<String> sixLetterWords;
 	

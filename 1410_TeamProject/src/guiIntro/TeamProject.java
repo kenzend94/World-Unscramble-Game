@@ -3,6 +3,8 @@ package guiIntro;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -21,35 +25,34 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
 /**
  * GUI application
- * @author Khoi Nguyen
+ * @author Khoi Nguyen Michael Kamerath
  *
  */
 public class TeamProject extends JFrame{
 	private final int WORD_SIZE = 6;
-	private static final int SCORE_THRESHOLD = 170; 	// [TAG] - Khoi Nguyen
+	private final int MAX_TIME = 45;
 
 	private JPanel contentPane;
-	private JLabel[] guessLetters;
-	private JLabel[] possibleLetters;
+	private JLabel[] lblGuessLetters;
+	private JLabel[] lblPossibleLetters;
 	private JLabel lblTimer;
-	private String[] roundSixLetterWords;
+	private JLabel lblScore;
+	private List<String> roundSixLetterWords;
 	private List<String> allSixLetterWords;
-	private List<String> correctAnswers;				// [TAG] - Khoi Nguyen
 	private LinkedHashMap<String, Boolean> gameWords;
-	private ArrayList<JLabel> guessedWords;
+	private List<JLabel> lblGuessedWords;
 	private List<Character> gameWordChars;
 	private List<Character> guessWordChars;
 	private Random randNum;
-	private String answer;	 							// [TAG] - Khoi Nguyen
 	private int score;									// [TAG] - Khoi Nguyen
-	private static int previousTime;					// [TAG] - Khoi Nguyen
-	private List<Character> lastWord;					// [TAG] - Khoi Nguyen
+	private String lastWord;							// [TAG] - Khoi Nguyen
 	
 	
 	Timer timer;
@@ -61,16 +64,18 @@ public class TeamProject extends JFrame{
 	public TeamProject(List<String> sixLetterWords) {
 		this.allSixLetterWords = sixLetterWords;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 754, 583);
+		setBounds(200, 50, 754, 750);
 		
 		randNum = new Random();
 		
 		JMenuBar menuBar = menuBar();
 		setJMenuBar(menuBar);
+		lblGuessedWords = new ArrayList<JLabel>();
+		roundSixLetterWords = new ArrayList<String>();
+		gameWords = new LinkedHashMap<String, Boolean>();
 		gameWordChars = new ArrayList<Character>();
 		guessWordChars = new ArrayList<Character>();
-		lastWord = new ArrayList<Character>(); 			// [TAG] - Khoi Nguyen
-		correctAnswers = new ArrayList<String>();		// [TAG] - Khoi Nguyen
+		lastWord = new String("");
 		
 		contentPane = new JPanel();
 		contentPane.setFocusable(true);
@@ -98,14 +103,27 @@ public class TeamProject extends JFrame{
 						char temp = guessWordChars.get(guessWordChars.size() - 1);
 						guessWordChars.remove(guessWordChars.size() - 1);
 						gameWordChars.add(temp);
-						updateCharacterLabels();
+						updateLabels();
 					}
+				}
+				// Enter either puts the last word up or guesses with the current letters
+				else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (guessWordChars.isEmpty()) {
+						lastWordAction();
+					}
+					else {
+						checkWordGuess();
+					}
+				}
+				// Space scrambles the letters for when someone needs a different order of letters.
+				else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+					twistLetters();
 				}
 			}
 			private void moveLettersUp(KeyEvent e) {
 				gameWordChars.remove((Character)e.getKeyChar());
 				guessWordChars.add(e.getKeyChar());
-				updateCharacterLabels();
+				updateLabels();
 			}
 		});
 		
@@ -121,7 +139,7 @@ public class TeamProject extends JFrame{
 		JButton btnClear = buttonClear();
 		contentPane.add(btnClear);
 		
-		JLabel lblScore = labelScore();
+		lblScore = labelScore();
 		contentPane.add(lblScore);
 		
 		JLabel lblTime = labelTime();
@@ -139,22 +157,21 @@ public class TeamProject extends JFrame{
 		lblTimer = labelTimer();
 		contentPane.add(lblTimer);	
 				
-		possibleLetters = labelPossibleLetters();
-		for (JLabel lbl : possibleLetters) {
+		lblPossibleLetters = createPossibleLettersLbl();
+		for (JLabel lbl : lblPossibleLetters) {
 			contentPane.add(lbl);
 		}
 		
-		guessLetters = labelGuessLetters();
-		for (JLabel lbl : guessLetters) {
+		lblGuessLetters = createGuessLettersLbl();
+		for (JLabel lbl : lblGuessLetters) {
 			contentPane.add(lbl);
 		}
 		
-		newRound();
-		
-		timer.stop();
+				
 		String name = JOptionPane.showInputDialog("Please enter your name below:");
 		label.setText(name);
-		timer.start();
+		
+		newRound();
 	}
 	
 	
@@ -162,42 +179,82 @@ public class TeamProject extends JFrame{
 	 * @author Michael Kamerath
 	 * @return list of labels of the letters in the guess word
 	 */
-	private JLabel[] labelPossibleLetters() {
-		JLabel[] lblPossibleLetters = new JLabel[WORD_SIZE];
+	private JLabel[] createPossibleLettersLbl() {
+		JLabel[] lbllblPossibleLetters = new JLabel[WORD_SIZE];
 		for (int i = 0; i < WORD_SIZE; ++i) {
-			lblPossibleLetters[i] = new JLabel("");
-			lblPossibleLetters[i].setBounds(60*i+375, 220, 40, 40);
-			//lblPossibleLetters[i].setBounds(40*i+375, 110, 40, 40);
+			lbllblPossibleLetters[i] = new JLabel("");
+			lbllblPossibleLetters[i].setBounds(60*i+375, 220, 40, 40);
 		}
-		return lblPossibleLetters;
+		return lbllblPossibleLetters;
 	}
 	
 	/**
 	 * @author Michael Kamerath
 	 * @return list of possible guess letters
 	 */
-	private JLabel[] labelGuessLetters() {
+	private JLabel[] createGuessLettersLbl() {
 		JLabel[] lblGuessLetters = new JLabel[WORD_SIZE];
 		for (int i = 0; i < WORD_SIZE; ++i) {
 			lblGuessLetters[i] = new JLabel("");
-			lblGuessLetters[i].setBounds(60*i+375, 40, 40, 40);
-			//lblGuessLetters[i].setBounds(40*i+375, 40, 40, 40);
+			lblGuessLetters[i].setBounds(60*i+375, 40, 45, 45);
+			lblGuessLetters[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			lblGuessLetters[i].setBackground(Color.WHITE);
+			lblGuessLetters[i].setOpaque(true);
+			
 		}
 		
 		return lblGuessLetters;
 	}
+	
+	/**
+	 * Creates labels for each of the blank words that are filled in as
+	 * they are guessed. Called at the beginning of each new round.
+	 * 
+	 * @author Michael Kamerath
+	 * @return labels for the blank spaces on the left side of the game.
+	 */
+	private ArrayList<JLabel> createGuessedWordsLbl() {
+		ArrayList<JLabel> result = new ArrayList<JLabel>();
+		int additionalX = 40;
+		int additionalY = 0;
+		for (int i = 0; i < gameWords.size(); ++i) {
+			JLabel lbl = new JLabel();
+			if (i % 2 == 0) {
+				additionalY += 15;
+				additionalX = 0;
+			}
+			else {
+				additionalX = 100;
+			}
+			lbl.setBounds(20 + additionalX, 30 + additionalY, 60, 15);
+			lbl.setText("Thing");
+			result.add(lbl);
+		}
+		return result;
+	}
 
 	private JLabel labelTimer() {
-		JLabel lblTimer = new JLabel("03:00");
-		lblTimer.setBounds(327, 473, 46, 14);
-		
-		timer = new Timer(1000, new ActionListener() {
-			int time = 180;
+		JLabel lblTimer = new JLabel("");
+		lblTimer.setBounds(327, 473, 46, 14);		
+		return lblTimer;
+	}
+	
+	/**
+	 * @author Michael Kamerath Khoi Nyugen
+	 * @return A timer for the round.
+	 */
+	private Timer createRoundTimer() {
+		Timer timer = new Timer(1000, new ActionListener() {
+			int time = MAX_TIME;
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				time--;
 				lblTimer.setText(String.format("%02d:%02d", time / 60, time % 60));
+				for (boolean value : gameWords.values()) {
+					if (!value) {
+						break;
+					}
+				}
 				if (time == 0) {
 					final Timer timer = (Timer) e.getSource();
 					timer.stop();
@@ -209,19 +266,18 @@ public class TeamProject extends JFrame{
 						}
 					}
 					if (goToNextRound) {
+						JOptionPane.showMessageDialog(contentPane, "Good job! next round");
 						newRound();
 					}
 					else {
-						JOptionPane.showMessageDialog(contentPane, "Time's up.");
+						JOptionPane.showMessageDialog(contentPane, "Game Over");
+						newGame();
 					}
 				}
 			}
 			
 		});
-		
-	    timer.start();
-		
-		return lblTimer;
+		return timer;
 	}
 
 	private JLabel labelMessage() {
@@ -232,7 +288,7 @@ public class TeamProject extends JFrame{
 
 	private JLabel labelYourName() {		
 		JLabel label = new JLabel("");
-		label.setBounds(49, 11, 96, 14);
+		label.setBounds(49, 11, 150, 14);
 		return label;
 	}
 
@@ -255,18 +311,11 @@ public class TeamProject extends JFrame{
 	private JLabel labelScore() {
 		JLabel lblScore = new JLabel("SCORE");
 		lblScore.setBounds(327, 398, 100, 14);
-		Timer t = new Timer(200, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				lblScore.setText("SCORE   " + String.valueOf(score));	
-			}
-		});
-		t.start();
 		return lblScore;
 	}
 
 	/**
-	 * @author Khoi Nguyen
+	 * @author Khoi Nguyen Michael Kamerath
 	 * @return clear the word typed on the GUI.
 	 */
 	private JButton buttonClear() {
@@ -275,17 +324,9 @@ public class TeamProject extends JFrame{
 		btnClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				for (int i = 0; i < guessWordChars.size(); ++i) 
-					guessLetters[i].setIcon(null);
-
-				
-				char[] chars = getString(guessWordChars).toCharArray();
-				for(char c : chars)
-					gameWordChars.add(c); 
-				
+				gameWordChars.addAll(guessWordChars);
 				guessWordChars.clear();
-				for (int i = 0; i < gameWordChars.size(); ++i) 
-					possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
+				updateLabels();
 				
 				contentPane.requestFocusInWindow();
 			}
@@ -302,39 +343,10 @@ public class TeamProject extends JFrame{
 		JButton btnLastWord = new JButton("Last Word");
 		btnLastWord.setBounds(516, 312, 104, 40);
 		btnLastWord.addActionListener( new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!guessWordChars.isEmpty())
-				{
-					JOptionPane.showMessageDialog(contentPane, "Can't show the last word until the guessing area is clear!", "Warning:", JOptionPane.ERROR_MESSAGE);
-					contentPane.requestFocusInWindow();
-					return;
-				}
-				
-				if(lastWord.isEmpty())
-				{
-					JOptionPane.showMessageDialog(contentPane, "You have not taken any guess!", "Warning:", JOptionPane.ERROR_MESSAGE);
-					contentPane.requestFocusInWindow();
-					return;
-				}
-				
-				for (int i = 0; i < gameWordChars.size(); ++i) 
-					possibleLetters[i].setIcon(null);
-
-				
-				char[] chars = getString(lastWord).toCharArray();
-				for(char c : chars)
-					guessWordChars.add(c); 
-				
-				gameWordChars.clear();
-				
-				for (int i = 0; i < guessWordChars.size(); ++i) 
-					guessLetters[i].setIcon(new ImageIcon("Resources/letters/" + guessWordChars.get(i) + ".png"));
-				
-				contentPane.requestFocusInWindow();
-			}
-			
+				lastWordAction();
+			}			
 		});
 		return btnLastWord;
 	}
@@ -348,63 +360,8 @@ public class TeamProject extends JFrame{
 		btnEnter.setBounds(421, 312, 71, 40);
 		btnEnter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(guessWordChars.toString());
-				if (guessWordChars.size() != WORD_SIZE)
-				{
-					JOptionPane.showMessageDialog(contentPane, "Guess again!", "Result:", JOptionPane.INFORMATION_MESSAGE);
-					contentPane.requestFocusInWindow();
-					return;
-				}
+				checkWordGuess();
 				
-				if(getString(guessWordChars).equals(answer))
-				{
-					// Output score
-					score += calculateScoreBasedOnTime(lblTimer.getText());
-					System.out.println(score);
-					
-					correctAnswers.add(answer);
-					for(int i = 0; i < correctAnswers.size(); i++)
-					{
-						System.out.println(correctAnswers.get(i));
-						String ans = correctAnswers.get(i);
-						char[] chars = ans.toCharArray();
-						for(int j = 0; j < chars.length; j++)
-						{
-							JLabel label = new JLabel("");
-							label.setBounds(42*j + 20, 475 - 43*i, 40, 40);
-							label.setIcon(new ImageIcon("Resources/letters/" + chars[j] + ".png"));
-							contentPane.add(label);
-							contentPane.repaint();
-							System.out.println(chars[j] + "\n");
-						}
-					}
-					
-					JOptionPane.showMessageDialog(contentPane, "Correct word!", "Result:", JOptionPane.INFORMATION_MESSAGE);
-					// Advance to the next word
-					newRound();
-				}
-				else
-				{
-					lastWord.clear();
-					for (int i = 0; i < guessWordChars.size(); ++i) 
-						guessLetters[i].setIcon(null);
-					
-					char[] chars = getString(guessWordChars).toCharArray();
-					for(char c : chars)
-					{
-						gameWordChars.add(c); 
-						lastWord.add(c);
-					}
-					Collections.shuffle(gameWordChars);
-					guessWordChars.clear();
-					
-					for (int i = 0; i < gameWordChars.size(); ++i) 
-						possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
-					
-					
-					JOptionPane.showMessageDialog(contentPane, "Guess again!", "Result:", JOptionPane.INFORMATION_MESSAGE);
-				}
-				contentPane.requestFocusInWindow();
 			}
 		});
 		return btnEnter;
@@ -419,11 +376,7 @@ public class TeamProject extends JFrame{
 		btnTwist.setBounds(327, 312, 71, 40);
 		btnTwist.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Collections.shuffle(gameWordChars);
-				for (int i = 0; i < gameWordChars.size(); ++i) {
-					possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
-				}
-				contentPane.requestFocusInWindow();
+				twistLetters();
 			}
 		});
 		return btnTwist;
@@ -434,6 +387,12 @@ public class TeamProject extends JFrame{
 		JMenu menuFile = new JMenu("File");
 		
 		JMenuItem File_NewGame = new JMenuItem("New Game");
+		File_NewGame.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				newGame();
+			}
+		});
 		JMenuItem File_Open = new JMenuItem("Open");
 		JMenuItem File_Save = new JMenuItem("Save");
 		JMenuItem File_Exit = new JMenuItem("Exit");
@@ -458,72 +417,112 @@ public class TeamProject extends JFrame{
 	}
 	
 	/**
+	 * Called every time a new round starts. Picks a random six letter word and starts a round
+	 * based on that six letter word.
+	 * 
 	 * @author Michael Kamerath
 	 */
 	private void newRound() {
+		for (JLabel lbl : lblGuessedWords) {
+			lbl.getParent().remove(lbl);
+		}
+		timer = createRoundTimer();
 		// Resetting variables
+		roundSixLetterWords.clear();
 		gameWordChars.clear();
-		lastWord.clear(); 				// [TAG] - Khoi Nguyen
+		gameWords.clear();
+		lastWord = "";
 		guessWordChars.clear(); 		// [TAG] - Khoi Nguyen
 		
 		int position = this.randNum.nextInt(this.allSixLetterWords.size());
-		answer = allSixLetterWords.get(position);					// [TAG] - Khoi Nguyen
-		System.out.println(answer);									// [TAG] - Khoi Nguyen
-		for (int i = 0; i < answer.length(); ++i) {					// [TAG] - Khoi Nguyen
-			gameWordChars.add(answer.charAt(i));					// [TAG] - Khoi Nguyen
+		String gameWord = allSixLetterWords.get(position);
+		for (int i = 0; i < gameWord.length(); ++i) {
+			gameWordChars.add(gameWord.charAt(i));
 		}
 		Collections.shuffle(gameWordChars);
 		
-		for (int i = 0; i < gameWordChars.size(); ++i) {
-			possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
+		try (Scanner inFile = new Scanner(new FileReader("../.textfiles/" + gameWord + ".txt"))) {
+			String line = null;
+			while (inFile.hasNextLine()) {
+				line = inFile.nextLine();
+				gameWords.put(line, false);
+				if (line.length() == WORD_SIZE) {
+					roundSixLetterWords.add(line);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		
-		for (int i = 0; i < WORD_SIZE; ++i) {
-			guessLetters[i].setIcon(null);
+		lblGuessedWords = createGuessedWordsLbl();
+		for (JLabel lbl : lblGuessedWords) {
+			contentPane.add(lbl);
 		}
+		
+		updateLabels();
+		contentPane.validate();
+		contentPane.repaint();
+		timer.start();
 		
 	}
 	
+	private void newGame() {
+		timer.stop();
+		score = 0;
+		newRound();
+	}
+	
 	/**
+	 * Updates labels with the newest information based on input happening in the game.
+	 * Updated labels include lblGuessLetters, lblPossibleLetters, and score.
+	 * 
 	 * @author Michael Kamerath
 	 */
-	private void updateCharacterLabels() {
+	private void updateLabels() {
 		for (int i = 0; i < guessWordChars.size(); ++i) {
-			guessLetters[i].setIcon(new ImageIcon("Resources/letters/" + guessWordChars.get(i) + ".png"));
+			lblGuessLetters[i].setIcon(new ImageIcon("Resources/letters/" + guessWordChars.get(i) + ".png"));
 		}
 		
 		for (int i = guessWordChars.size(); i < gameWordChars.size() + guessWordChars.size(); ++i) {
-			guessLetters[i].setIcon(null);
+			lblGuessLetters[i].setIcon(null);
 		}
 		
 		for (int i = 0; i < gameWordChars.size(); ++i) {
-			possibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
+			lblPossibleLetters[i].setIcon(new ImageIcon("Resources/letters/" + gameWordChars.get(i) + ".png"));
 		}
 		
 		for (int i = gameWordChars.size(); i < gameWordChars.size() + guessWordChars.size(); ++i) {
-			possibleLetters[i].setIcon(null);
+			lblPossibleLetters[i].setIcon(null);
+		}
+		
+		lblScore.setText("SCORE: " + score);
+		
+		if (lblGuessedWords.size() == 0) {
+			return;
+		}
+		int position = 0;
+		for (String key : gameWords.keySet()) {
+			if (gameWords.get(key)) {
+				lblGuessedWords.get(position).setText(key);
+			}
+			else {
+				StringBuilder result = new StringBuilder();
+				for (int i = 0; i < key.length(); ++i) {
+					result.append("_ ");
+				}
+				lblGuessedWords.get(position).setText(result.toString());
+				
+			}
+			++position;
 		}
 	}
 	
 	/**
+	 * Converts a String of time into an int.
+	 * 
 	 * @author Khoi Nguyen
-	 * @param list
-	 * @return
-	 */
-	private static String getString(List<Character> list)
-	{    
-	    StringBuilder builder = new StringBuilder(list.size());
-	    for(Character ch: list)
-	    {
-	        builder.append(ch);
-	    }
-	    return builder.toString();
-	}
-	
-	/**
-	 * @author Khoi Nguyen
-	 * @param time
-	 * @return
+	 * @param time a String representation of the time
+	 * @return the time as an integer
 	 */
 	private static int convertTimeToSeconds(String time)
 	{
@@ -533,32 +532,83 @@ public class TeamProject extends JFrame{
 	}
 	
 	/**
-	 * @author Khoi Nguyen
-	 * @param timeS
-	 * @return
+	 * Updates the score based on the length of the word guessed.
+	 * 3 letter word is 90 points.
+	 * 4 letter word is 160 points.
+	 * 5 letter word is 250 points.
+	 * 6 letter word is 360 points.
+	 * @param word The correctly guessed word
 	 */
-	private static int calculateScoreBasedOnTime(String timeS)
+	private void updateScoreBasedOnWordLength(String word) {
+		score += word.length() * word.length() * 10;
+	}
+	
+	/**
+	 * @author Khoi Nguyen Michael Kamerath
+	 * @param timeS
+	 */
+	private void calculateScoreBasedOnTime(String timeS)
 	{
 		int time = convertTimeToSeconds(timeS);
 		
-		int timeSpentToSolve;
-		if (previousTime == 0)
-			timeSpentToSolve = SCORE_THRESHOLD - time;
-		else
-			timeSpentToSolve = previousTime - time;
-		previousTime = time;
+		int timeSpentToSolve = this.MAX_TIME - time;
 		
-		if (timeSpentToSolve < 10)
-			return 100;
-		else if (timeSpentToSolve < 15)
-			return 90;
-		else if (timeSpentToSolve < 25)
-			return 70;
-		else if (timeSpentToSolve < 45)
-			return 50;
-		else if (timeSpentToSolve < 70)
-			return 25;
-		return 0;
+		if (timeSpentToSolve < 60)
+			score += 2500;
+		else if (timeSpentToSolve < 90)
+			score += 2000;
+		else if (timeSpentToSolve < 120)
+			score += 1500;
+		else if (timeSpentToSolve < 150)
+			score += 1000;
+		else
+			score += 500;
+	}
+	
+	/**
+	 * Checks whether the guessed word at top is in the list. Updates labels accordingly.
+	 * @author Michael Kamerath
+	 */
+	private void checkWordGuess() {
+		String guessedWord = guessWordChars.stream().map(String::valueOf).collect(Collectors.joining());
+		if (gameWords.containsKey(guessedWord)) {
+			if (!gameWords.get(guessedWord)) {
+				gameWords.put(guessedWord, true);
+				updateScoreBasedOnWordLength(guessedWord);
+				lastWord = guessedWord;
+			}
+			else {
+				lastWord = "";
+			}
+		}
+		gameWordChars.addAll(guessWordChars);
+		guessWordChars.clear();
+		updateLabels();
+		contentPane.requestFocusInWindow();
+	}
+	
+	/**
+	 * Mixes up the game letters to avoid getting stuck.
+	 * @author Michael Kamerath
+	 */
+	private void twistLetters() {
+		Collections.shuffle(gameWordChars);
+		updateLabels();
+		contentPane.requestFocusInWindow();
+	}
+	
+	/**
+	 * Moves the last word back up if it was a correct word.
+	 * @author Michael Kamerath
+	 */
+	private void lastWordAction() {
+		for (int i = 0; i < lastWord.length(); ++i) {
+			guessWordChars.add((Character)lastWord.charAt(i));
+			gameWordChars.remove((Character)lastWord.charAt(i));
+		}
+		updateLabels();
+		contentPane.requestFocusInWindow();
+		lastWord = "";
 	}
 	
 }
