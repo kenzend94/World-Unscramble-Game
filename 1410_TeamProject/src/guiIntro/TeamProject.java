@@ -3,9 +3,14 @@ package guiIntro;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +34,8 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * GUI application
@@ -36,6 +43,7 @@ import javax.swing.JLabel;
  *
  */
 public class TeamProject extends JFrame{
+	private static final String path = "src/guiIntro/UserRank.txt";
 	private final int WORD_SIZE = 6;
 	private final int MAX_TIME = 45;
 
@@ -44,6 +52,7 @@ public class TeamProject extends JFrame{
 	private JLabel[] lblPossibleLetters;
 	private JLabel lblTimer;
 	private JLabel lblScore;
+	private JLabel lblAnnounce;
 	private List<String> roundSixLetterWords;
 	private List<String> allSixLetterWords;
 	private LinkedHashMap<String, Boolean> gameWords;
@@ -53,6 +62,9 @@ public class TeamProject extends JFrame{
 	private Random randNum;
 	private int score;									// [TAG] - Khoi Nguyen
 	private String lastWord;							// [TAG] - Khoi Nguyen
+	private PrintWriter writer;
+	private BufferedReader reader;
+	private String name;
 	
 	
 	Timer timer;
@@ -62,6 +74,22 @@ public class TeamProject extends JFrame{
 	 * Create the frame.
 	 */
 	public TeamProject(List<String> sixLetterWords) {
+		File file = new File(path);
+		try {
+			writer  = new PrintWriter(file);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try {
+			reader = new BufferedReader( new FileReader(file));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		this.allSixLetterWords = sixLetterWords;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(200, 50, 754, 750);
@@ -156,6 +184,9 @@ public class TeamProject extends JFrame{
 		
 		lblTimer = labelTimer();
 		contentPane.add(lblTimer);	
+		
+		lblAnnounce = labelAnnounce();
+		contentPane.add(lblAnnounce);
 				
 		lblPossibleLetters = createPossibleLettersLbl();
 		for (JLabel lbl : lblPossibleLetters) {
@@ -168,10 +199,17 @@ public class TeamProject extends JFrame{
 		}
 		
 				
-		String name = JOptionPane.showInputDialog("Please enter your name below:");
+		name = JOptionPane.showInputDialog("Please enter your name below:");
 		label.setText(name);
 		
 		newRound();
+	}
+
+
+	private JLabel labelAnnounce() {
+		JLabel labelAnnounce = new JLabel("");
+		labelAnnounce.setBounds(327, 127, 151, 58);
+		return labelAnnounce;
 	}
 	
 	
@@ -246,6 +284,7 @@ public class TeamProject extends JFrame{
 	private Timer createRoundTimer() {
 		Timer timer = new Timer(1000, new ActionListener() {
 			int time = MAX_TIME;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				time--;
@@ -267,10 +306,30 @@ public class TeamProject extends JFrame{
 					}
 					if (goToNextRound) {
 						JOptionPane.showMessageDialog(contentPane, "Good job! next round");
+						
 						newRound();
 					}
 					else {
 						JOptionPane.showMessageDialog(contentPane, "Game Over");
+						//String line = "";
+						/*
+						while(true)
+						{
+							try {
+								line= reader.readLine();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							if(line == null)
+								break;
+							String[] comps = line.split(" ");
+							if (comps[0].equals(name))
+								break;
+						}
+						*/
+						writer.println(name + " " + String.valueOf(score));
+						writer.close();
 						newGame();
 					}
 				}
@@ -405,6 +464,32 @@ public class TeamProject extends JFrame{
 		JMenu menuOptions = new JMenu("Options");
 		
 		JMenuItem Options_UserRanks = new JMenuItem("User Ranks");
+		Options_UserRanks.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String out = "";
+				String line = "";
+				
+				while (true)
+				{
+					try {
+						line = reader.readLine();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					if (line == null)
+						break;
+					
+					out += line + "\n";
+					System.out.println("inside");
+				}
+				JOptionPane.showMessageDialog(contentPane, out, "User Rank:", JOptionPane.INFORMATION_MESSAGE);
+
+				
+			}
+		});
 		JMenuItem Options_ChangBackground = new JMenuItem("Change Background");
 		
 		menuOptions.add(Options_UserRanks);
@@ -580,7 +665,16 @@ public class TeamProject extends JFrame{
 			else {
 				lastWord = "";
 			}
+			lblAnnounce.setText("Correct!");
+			lblAnnounce.setFont(new Font(lblAnnounce.getName(), Font.PLAIN, 30));
+			//lblAnnounce.setOpaque(false);
+			lblAnnounce.setForeground(Color.GREEN);
 		}
+		else 
+		{
+			lblAnnounce.setText("Guess again!");
+		}
+		contentPane.repaint();
 		gameWordChars.addAll(guessWordChars);
 		guessWordChars.clear();
 		updateLabels();
@@ -610,5 +704,4 @@ public class TeamProject extends JFrame{
 		contentPane.requestFocusInWindow();
 		lastWord = "";
 	}
-	
 }
